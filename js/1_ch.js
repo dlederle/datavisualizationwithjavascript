@@ -33,22 +33,51 @@ window.onload = co2;
 function drawCO2growth(data) {
   const co2 = data.map(row => [row.year, row.co2]);
   const temp = data.map(row => [row.year, row.globaltemp]);
-  const config = [
-    {
-      data: co2,
-      lines: {
-        show: true,
+  const historicalAverage = data.map(row => [row.year, 0]);
+  const config = {
+    title:
+      "Global Temperature Deviation and CO<sub>2</sub> Concentration (NOAA Data)",
+    grid: {
+      horizontalLines: false,
+      verticalLines: false,
+    },
+    yaxis: {
+      min: -0.5,
+      max: 2,
+      tickFormatter: function(val) {
+        return val + " °C";
       },
     },
+    y2axis: { min: 300, max: 400 },
+  };
+  const series = [
     {
+      label: "20<sup>th</sup> Century Baseline Temperature",
+      data: historicalAverage,
+      lines: {
+        show: true,
+        lineWidth: 1,
+      },
+      shadowSize: 0,
+      color: "#545454",
+    },
+    {
+      label: "Yearly Temperature Difference (°C)",
       data: temp,
       lines: {
         show: true,
       },
+    },
+    {
+      label: "CO<sub>2</sub> Concentration (ppm)",
+      data: co2,
       yaxis: 2,
+      lines: {
+        show: true,
+      },
     },
   ];
-  Flotr.draw(document.getElementById("chart"), config);
+  Flotr.draw(document.getElementById("chart"), series, config);
 }
 
 function drawTeamComparison() {
