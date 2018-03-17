@@ -24,56 +24,60 @@ function drawKatrinaPath() {
     { north: 32.9, west: 88.9, wind: 65 },
     { north: 34.7, west: 88.4, wind: 50 },
   ];
-  const formatted = katrina.map(row => [-1 * row.west, row.north, row.wind]);
-  const tropicalDepression = formatted.filter(row => row[2] < 39);
-  const tropicalStorm = formatted.filter(row => row[2] > 39 && row[2] < 74);
-  const cat1 = formatted.filter(row => row[2] > 73 && row[2] < 95);
-  const cat2 = formatted.filter(row => row[2] > 94 && row[2] < 110);
-  const cat3 = formatted.filter(row => row[2] > 109 && row[2] < 130);
-  const cat4 = formatted.filter(row => row[2] > 129 && row[2] < 157);
-  const cat5 = formatted.filter(row => row[2] >= 157);
-  const series = [
+  const categories = [
     {
-      data: tropicalDepression,
+      label: "",
+      min: 0,
+      max: 39,
       color: "#74add1",
-      bubbles: { show: true, baseRadius: 0.3, lineWidth: 1 },
     },
     {
-      data: tropicalStorm,
+      label: "",
+      min: 40,
+      max: 74,
       color: "#abd9e9",
-      bubbles: { show: true, baseRadius: 0.3, lineWidth: 1 },
     },
     {
       label: "Category 1",
-      data: cat1,
+      min: 74,
+      max: 95,
       color: "#ffffbf",
-      bubbles: { show: true, baseRadius: 0.3, lineWidth: 1 },
     },
     {
       label: "Category 2",
-      data: cat2,
+      min: 95,
+      max: 110,
       color: "#fee090",
-      bubbles: { show: true, baseRadius: 0.3, lineWidth: 1 },
     },
     {
       label: "Category 3",
-      data: cat3,
+      min: 110,
+      max: 130,
       color: "#fdae61",
-      bubbles: { show: true, baseRadius: 0.3, lineWidth: 1 },
     },
     {
       label: "Category 4",
-      data: cat4,
+      min: 130,
+      max: 157,
       color: "#f46d43",
-      bubbles: { show: true, baseRadius: 0.3, lineWidth: 1 },
     },
     {
       label: "Category 5",
-      data: cat5,
+      min: 157,
+      max: Infinity,
       color: "#d73027",
-      bubbles: { show: true, baseRadius: 0.3, lineWidth: 1 },
     },
   ];
+  const series = categories.map(category => {
+    return {
+      label: category.label,
+      color: category.color,
+      data: katrina
+        .filter(row => row.wind >= category.min && row.wind < category.max)
+        .map(row => [-1 * row.west, row.north, row.wind]),
+      bubbles: { show: true, baseRadius: 0.3, lineWidth: 1 },
+    };
+  });
   const config = {
     grid: {
       horizontalLines: false,
