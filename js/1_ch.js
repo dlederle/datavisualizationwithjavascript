@@ -23,8 +23,33 @@ const years = [
   [5, "2011"],
   [6, "2012"],
 ];
+const co2 = loadData("data/co2.csv")
+  .then(convertToJson)
+  .then(data => data.data)
+  .then(drawCO2growth);
 
-window.onload = drawTeamComparison;
+window.onload = co2;
+
+function drawCO2growth(data) {
+  const co2 = data.map(row => [row.year, row.co2]);
+  const temp = data.map(row => [row.year, row.globaltemp]);
+  const config = [
+    {
+      data: co2,
+      lines: {
+        show: true,
+      },
+    },
+    {
+      data: temp,
+      lines: {
+        show: true,
+      },
+      yaxis: 2,
+    },
+  ];
+  Flotr.draw(document.getElementById("chart"), config);
+}
 
 function drawTeamComparison() {
   const config = {
@@ -73,4 +98,36 @@ function drawManCity() {
     },
   };
   Flotr.draw(document.getElementById("chart"), wins, config);
+}
+
+// Kinda ugly but it works
+function convertToJson(csv) {
+  const json = { data: [] };
+  csv = csv.split("\n");
+  const headers = csv
+    .splice(0, 1)[0]
+    .split(",")
+    .map(key => key.trim());
+
+  for (line of csv) {
+    if (line.length < 1) {
+      continue;
+    }
+    line = line.split(",");
+    if (line.length != headers.length) {
+      throw "Poorly formatted CSV: " + line;
+    }
+
+    json.data.push(
+      headers.reduce((entry, key, i) => {
+        entry[key] = line[i];
+        return entry;
+      }, {})
+    );
+  }
+  return json;
+}
+
+function loadData(url) {
+  return fetch(url).then(response => response.text());
 }
