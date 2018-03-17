@@ -1,52 +1,172 @@
-// Man City wins per season
-// [Year, Wins]
-const wins = [
-  [
-    // 'Series'
-    [0, 13],
-    [1, 11],
-    [2, 15],
-    [3, 15],
-    [4, 18],
-    [5, 21],
-    [6, 28],
-  ],
-];
-const wins2 = [[[0, 28]], [[1, 28]], [[2, 21]], [[3, 20]], [[4, 19]]];
-const teams = [[0, "MCI"], [1, "MUN"], [2, "ARS"], [3, "TOT"], [4, "NEW"]];
-const years = [
-  [0, "2006"],
-  [1, "2007"],
-  [2, "2008"],
-  [3, "2009"],
-  [4, "2010"],
-  [5, "2011"],
-  [6, "2012"],
-];
-const co2 = loadData("data/co2.csv")
-  .then(convertToJson)
-  .then(data => data.data)
-  .then(drawCO2growth);
+/******************************************************************************
+ * Path of Katrina
+ */
+function drawKatrinaPath() {
+  const katrina = [
+    { north: 23.2, west: 75.5, wind: 35 },
+    { north: 24.0, west: 76.4, wind: 35 },
+    { north: 25.2, west: 77.0, wind: 45 },
+    { north: 26.0, west: 77.6, wind: 45 },
+    { north: 26.2, west: 78.7, wind: 50 },
+    { north: 26.1, west: 79.9, wind: 75 },
+    { north: 25.5, west: 80.7, wind: 75 },
+    { north: 25.1, west: 82.2, wind: 100 },
+    { north: 24.8, west: 82.9, wind: 100 },
+    { north: 24.4, west: 84.0, wind: 110 },
+    { north: 24.4, west: 84.6, wind: 115 },
+    { north: 25.1, west: 86.8, wind: 145 },
+    { north: 25.7, west: 87.7, wind: 160 },
+    { north: 26.5, west: 88.6, wind: 175 },
+    { north: 27.9, west: 89.5, wind: 160 },
+    { north: 29.7, west: 89.6, wind: 135 },
+    { north: 30.8, west: 89.6, wind: 105 },
+    { north: 31.9, west: 89.6, wind: 75 },
+    { north: 32.9, west: 88.9, wind: 65 },
+    { north: 34.7, west: 88.4, wind: 50 },
+  ];
+  const formatted = katrina.map(row => [-1 * row.west, row.north, row.wind]);
+  const tropicalDepression = formatted.filter(row => row[2] < 39);
+  const tropicalStorm = formatted.filter(row => row[2] > 39 && row[2] < 74);
+  const cat1 = formatted.filter(row => row[2] > 73 && row[2] < 95);
+  const cat2 = formatted.filter(row => row[2] > 94 && row[2] < 110);
+  const cat3 = formatted.filter(row => row[2] > 109 && row[2] < 130);
+  const cat4 = formatted.filter(row => row[2] > 129 && row[2] < 157);
+  const cat5 = formatted.filter(row => row[2] >= 157);
+  const series = [
+    {
+      data: tropicalDepression,
+      color: "#74add1",
+      bubbles: { show: true, baseRadius: 0.3, lineWidth: 1 },
+    },
+    {
+      data: tropicalStorm,
+      color: "#abd9e9",
+      bubbles: { show: true, baseRadius: 0.3, lineWidth: 1 },
+    },
+    {
+      label: "Category 1",
+      data: cat1,
+      color: "#ffffbf",
+      bubbles: { show: true, baseRadius: 0.3, lineWidth: 1 },
+    },
+    {
+      label: "Category 2",
+      data: cat2,
+      color: "#fee090",
+      bubbles: { show: true, baseRadius: 0.3, lineWidth: 1 },
+    },
+    {
+      label: "Category 3",
+      data: cat3,
+      color: "#fdae61",
+      bubbles: { show: true, baseRadius: 0.3, lineWidth: 1 },
+    },
+    {
+      label: "Category 4",
+      data: cat4,
+      color: "#f46d43",
+      bubbles: { show: true, baseRadius: 0.3, lineWidth: 1 },
+    },
+    {
+      label: "Category 5",
+      data: cat5,
+      color: "#d73027",
+      bubbles: { show: true, baseRadius: 0.3, lineWidth: 1 },
+    },
+  ];
+  const config = {
+    grid: {
+      horizontalLines: false,
+      verticalLines: false,
+      backgroundImage: "img/gulf.png",
+    },
+    yaxis: { showLabels: false, min: 23.607, max: 33.657 },
+    xaxis: { showLabels: false, min: -94.298, max: -77.586 },
+  };
 
-window.onload = co2;
+  Flotr.draw(document.getElementById("chart"), series, config);
+}
+window.onload = drawKatrinaPath;
 
-function drawCO2growth(data) {
+/******************************************************************************
+ * OECD
+ */
+function drawHealthCareScatter() {
+  loadData("data/healthdata.csv")
+    .then(convertToJson)
+    .then(data => data.data)
+    .then(plotHealthCareScatter);
+}
+
+// window.onload = drawHealthCareScatter;
+
+function plotHealthCareScatter(data) {
+  const healthData = data.map(row => [row.healthspending, row.lifeexpectancy]);
+  console.log(healthData);
+  const series = [
+    {
+      data: healthData,
+      points: { show: true },
+    },
+  ];
+  const config = {
+    title: "Life Expectancy vs Health-Care Spending",
+    subtitle: "(by country, OECD data)",
+    xaxis: {
+      min: 5,
+      max: 20,
+      tickDecimals: 0,
+      title: "Spending as Percentage of GDP",
+      tickFormatter: tick => `${tick}%`,
+    },
+    yaxis: { min: 70, max: 90, tickDecimals: 0, title: "Avg. Life Expectancy" },
+  };
+  Flotr.draw(document.getElementById("chart"), series, config);
+}
+
+/******************************************************************************
+ * Global Poverty pie chart
+ */
+function drawPovertyPie() {
+  const series = [
+    { data: [[0, 22.4]], label: "Extreme Poverty" },
+    { data: [[1, 77.6]] },
+  ];
+  const config = {
+    title: "How Much of the World Lives on $1.25 a day? (2008)",
+    pie: { show: true },
+    yaxis: { showLabels: false },
+    xaxis: { showLabels: false },
+    grid: { horizontalLines: false, verticalLines: false },
+  };
+  Flotr.draw(document.getElementById("chart"), series, config);
+}
+// window.onload = drawPovertyPie;
+
+/******************************************************************************
+ * NOAA temperature line chart
+ */
+function drawCO2growth() {
+  loadData("data/co2.csv")
+    .then(convertToJson)
+    .then(data => data.data)
+    .then(plotCO2Growth);
+}
+// window.onload = drawCO2growth;
+
+function plotCO2Growth(data) {
+  console.log("Plotting co2");
   const co2 = data.map(row => [row.year, row.co2]);
   const temp = data.map(row => [row.year, row.globaltemp]);
   const historicalAverage = data.map(row => [row.year, 0]);
   const config = {
     title:
       "Global Temperature Deviation and CO<sub>2</sub> Concentration (NOAA Data)",
-    grid: {
-      horizontalLines: false,
-      verticalLines: false,
-    },
+    grid: { horizontalLines: false, verticalLines: false },
     yaxis: {
       min: -0.5,
       max: 2,
-      tickFormatter: function(val) {
-        return val + " °C";
-      },
+      tickFormatter: tick => `${tick} °C`,
     },
     y2axis: { min: 300, max: 400 },
   };
@@ -54,33 +174,40 @@ function drawCO2growth(data) {
     {
       label: "20<sup>th</sup> Century Baseline Temperature",
       data: historicalAverage,
-      lines: {
-        show: true,
-        lineWidth: 1,
-      },
+      lines: { show: true, lineWidth: 1 },
       shadowSize: 0,
       color: "#545454",
     },
     {
       label: "Yearly Temperature Difference (°C)",
       data: temp,
-      lines: {
-        show: true,
-      },
+      lines: { show: true },
     },
     {
       label: "CO<sub>2</sub> Concentration (ppm)",
       data: co2,
       yaxis: 2,
-      lines: {
-        show: true,
-      },
+      lines: { show: true },
     },
   ];
   Flotr.draw(document.getElementById("chart"), series, config);
 }
 
+/******************************************************************************
+ * EPL Bar Charts
+ */
 function drawTeamComparison() {
+  const wins2 = [[[0, 28]], [[1, 28]], [[2, 21]], [[3, 20]], [[4, 19]]];
+  const teams = [[0, "MCI"], [1, "MUN"], [2, "ARS"], [3, "TOT"], [4, "NEW"]];
+  const years = [
+    [0, "2006"],
+    [1, "2007"],
+    [2, "2008"],
+    [3, "2009"],
+    [4, "2010"],
+    [5, "2011"],
+    [6, "2012"],
+  ];
   const config = {
     title: "EPL Wins (2011-2012)",
     colors: ["#89AFD2", "#1D1D1D", "#DF021D", "#0E204B", "#E67840"],
@@ -95,18 +222,28 @@ function drawTeamComparison() {
       min: 0,
       tickDecimals: 0,
     },
-    xaxis: {
-      ticks: teams,
-    },
-    grid: {
-      horizontalLines: false,
-      verticalLines: false,
-    },
+    xaxis: { ticks: teams },
+    grid: { horizontalLines: false, verticalLines: false },
   };
   Flotr.draw(document.getElementById("chart"), wins2, config);
 }
+// window.onload = drawTeamComparison;
 
 function drawManCity() {
+  // Man City wins per season
+  // [Year, Wins]
+  const wins = [
+    [
+      // 'Series'
+      [0, 13],
+      [1, 11],
+      [2, 15],
+      [3, 15],
+      [4, 18],
+      [5, 21],
+      [6, 28],
+    ],
+  ];
   const config = {
     title: "Manchester City Wins",
     color: ["#89AFD2"],
@@ -114,20 +251,17 @@ function drawManCity() {
       show: true,
       barWidth: 0.5,
     },
-    grid: {
-      horizontalLines: false,
-      verticalLines: false,
-    },
-    yaxis: {
-      min: 0,
-      tickDecimals: false,
-    },
-    xaxis: {
-      ticks: years,
-    },
+    grid: { horizontalLines: false, verticalLines: false },
+    yaxis: { min: 0, tickDecimals: false },
+    xaxis: { ticks: years },
   };
   Flotr.draw(document.getElementById("chart"), wins, config);
 }
+// window.onload = drawManCity;
+
+/******************************************************************************
+ * Utilities
+ */
 
 // Kinda ugly but it works
 function convertToJson(csv) {
