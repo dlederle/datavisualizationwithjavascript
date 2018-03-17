@@ -1,5 +1,100 @@
 /******************************************************************************
- * Path of Katrina
+ * 2012 Heat starting 5, radar chart
+ */
+function drawHeatStartingFive() {
+  const players = [
+    {
+      player: "Chris Bosh",
+      points: 17.2,
+      rebounds: 7.9,
+      assists: 1.6,
+      steals: 0.8,
+      blocks: 0.8,
+    },
+    {
+      player: "Shane Battier",
+      points: 5.4,
+      rebounds: 2.6,
+      assists: 1.2,
+      steals: 1.0,
+      blocks: 0.5,
+    },
+    {
+      player: "LeBron James",
+      points: 28.0,
+      rebounds: 8.4,
+      assists: 6.1,
+      steals: 1.9,
+      blocks: 0.8,
+    },
+    {
+      player: "Dwyane Wade",
+      points: 22.3,
+      rebounds: 5.0,
+      assists: 4.5,
+      steals: 1.7,
+      blocks: 1.3,
+    },
+    {
+      player: "Mario Chalmers",
+      points: 10.2,
+      rebounds: 2.9,
+      assists: 3.6,
+      steals: 1.4,
+      blocks: 0.2,
+    },
+  ];
+  const team = {
+    points: 98.2,
+    rebounds: 41.3,
+    assists: 19.3,
+    steals: 8.5,
+    blocks: 5.3,
+  };
+  var get_player = function(name) {
+    for (var i = 0; i < players.length; i++) {
+      if (players[i].player === name) return players[i];
+    }
+  };
+  var player_data = function(name) {
+    var obj = {},
+      i = 0;
+    obj.label = name;
+    obj.data = [];
+    for (var key in team) {
+      obj.data.push([i, 100 * get_player(name)[key] / team[key]]);
+      i++;
+    }
+    return obj;
+  };
+  var labels = [
+    [0, "Points"],
+    [1, "Rebounds"],
+    [2, "Assists"],
+    [3, "Steals"],
+    [4, "Blocks"],
+  ];
+
+  const series = [
+    player_data("Chris Bosh"),
+    player_data("Shane Battier"),
+    player_data("LeBron James"),
+    player_data("Dwyane Wade"),
+    player_data("Mario Chalmers"),
+  ];
+  const config = {
+    title: "2011/2012 Miami Heat Starting Lineup  - Contribution to Team Total",
+    radar: { show: true },
+    grid: { circular: true },
+    xaxis: { ticks: labels },
+    yaxis: { showLabels: false, min: 0, max: 33 },
+  };
+  Flotr.draw(document.getElementById("chart"), series, config);
+}
+window.onload = drawHeatStartingFive;
+
+/******************************************************************************
+ * Path of Hurricane Katrina
  */
 function drawKatrinaPath() {
   const katrina = [
@@ -86,11 +181,12 @@ function drawKatrinaPath() {
     },
     yaxis: { showLabels: false, min: 23.607, max: 33.657 },
     xaxis: { showLabels: false, min: -94.298, max: -77.586 },
+    legend: { position: "sw", backgroundOpacity: 0 },
   };
 
   Flotr.draw(document.getElementById("chart"), series, config);
 }
-window.onload = drawKatrinaPath;
+// window.onload = drawKatrinaPath;
 
 /******************************************************************************
  * OECD
