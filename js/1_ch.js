@@ -51,23 +51,7 @@ function drawHeatStartingFive() {
     steals: 8.5,
     blocks: 5.3,
   };
-  var get_player = function(name) {
-    for (var i = 0; i < players.length; i++) {
-      if (players[i].player === name) return players[i];
-    }
-  };
-  var player_data = function(name) {
-    var obj = {},
-      i = 0;
-    obj.label = name;
-    obj.data = [];
-    for (var key in team) {
-      obj.data.push([i, 100 * get_player(name)[key] / team[key]]);
-      i++;
-    }
-    return obj;
-  };
-  var labels = [
+  const labels = [
     [0, "Points"],
     [1, "Rebounds"],
     [2, "Assists"],
@@ -75,13 +59,16 @@ function drawHeatStartingFive() {
     [4, "Blocks"],
   ];
 
-  const series = [
-    player_data("Chris Bosh"),
-    player_data("Shane Battier"),
-    player_data("LeBron James"),
-    player_data("Dwyane Wade"),
-    player_data("Mario Chalmers"),
-  ];
+  const series = players.map(player => {
+    const label = player.name;
+    delete player.name;
+    const playerStats = Object.values(player);
+    const teamStats = Object.values(team);
+    return {
+      label,
+      data: playerStats.map((stat, i) => stat / teamStats[i]),
+    };
+  });
   const config = {
     title: "2011/2012 Miami Heat Starting Lineup  - Contribution to Team Total",
     radar: { show: true },
